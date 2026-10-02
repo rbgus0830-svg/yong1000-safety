@@ -1767,6 +1767,249 @@ p {
     font-size: 10pt;
   }
 }
+
+/* =========================================================
+   슬라이드 3: 날짜별 간격 확대 + DAY 2 중앙 정렬
+========================================================= */
+
+/* 슬라이드 본문 전체 높이를 일정표와 하단 안내에 배분 */
+.schedule-content {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: clamp(16px, 2vh, 24px);
+
+  /* 기존 justify-content: flex-start 무효화 */
+  justify-content: stretch;
+  align-content: stretch;
+}
+
+/*
+  일정표 영역을 3개 행으로 구성합니다.
+
+  첫 번째 1fr : DAY 1이 들어가는 위쪽 공간
+  auto         : DAY 2가 들어가는 중앙 공간
+  두 번째 1fr : DAY 3이 들어가는 아래쪽 공간
+
+  위아래 공간의 크기가 같기 때문에
+  DAY 2의 중심이 일정표 영역 중앙에 위치합니다.
+*/
+.schedule-board {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto minmax(0, 1fr);
+
+  /* 날짜별 최소 간격 */
+  row-gap: clamp(18px, 2.4vh, 30px);
+
+  align-items: center;
+}
+
+/* DAY 1은 첫 번째 영역의 위쪽에 배치 */
+.schedule-day.day-1 {
+  align-self: start;
+}
+
+/* DAY 2는 일정표 전체의 중앙에 배치 */
+.schedule-day.day-2 {
+  align-self: center;
+}
+
+/* DAY 3은 마지막 영역의 아래쪽에 배치 */
+.schedule-day.day-3 {
+  align-self: end;
+}
+
+/* 날짜별 카드 자체의 여백도 약간 확대 */
+.schedule-day {
+  width: 100%;
+  padding: clamp(11px, 1.35vh, 16px);
+  border-radius: 19px;
+}
+
+/* DAY 1은 일정이 많으므로 카드 내부 간격 유지 */
+.schedule-day.day-1 .schedule-route {
+  row-gap: clamp(8px, 1vh, 11px);
+}
+
+/* DAY 2와 DAY 3의 카드 높이를 비슷하게 설정 */
+.schedule-day.day-2,
+.schedule-day.day-3 {
+  min-height: clamp(92px, 11.5vh, 118px);
+}
+
+/* 날짜 영역도 카드 높이에 맞게 확장 */
+.schedule-date {
+  height: 100%;
+  min-height: 76px;
+}
+
+/* 하단 안전 안내 영역 */
+.schedule-summary {
+  width: 100%;
+  margin-top: 0;
+}
+
+/* 낮은 화면에서는 간격을 줄여 내용 잘림 방지 */
+@media (max-height: 720px) {
+  .schedule-content {
+    gap: 10px;
+  }
+
+  .schedule-board {
+    row-gap: 10px;
+  }
+
+  .schedule-day {
+    padding: 7px;
+  }
+
+  .schedule-day.day-2,
+  .schedule-day.day-3 {
+    min-height: 76px;
+  }
+
+  .schedule-date {
+    min-height: 64px;
+  }
+
+  .schedule-stop {
+    min-height: 43px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+
+  .schedule-summary-item {
+    min-height: 38px;
+  }
+}
+
+/* PDF에서도 화면과 동일한 공간 배분 유지 */
+@media print {
+  .schedule-content {
+    display: grid !important;
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: 5mm;
+    align-content: stretch;
+  }
+
+  .schedule-board {
+    height: 100%;
+    display: grid !important;
+    grid-template-rows:
+      minmax(0, 1fr)
+      auto
+      minmax(0, 1fr);
+    row-gap: 5mm;
+    align-items: center;
+  }
+
+  .schedule-day.day-1 {
+    align-self: start;
+  }
+
+  .schedule-day.day-2 {
+    align-self: center;
+  }
+
+  .schedule-day.day-3 {
+    align-self: end;
+  }
+
+  .schedule-day {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
+
+/* =========================================================
+   슬라이드 3 날짜 간격 재조정
+========================================================= */
+
+/* 일정표가 화면 전체로 과도하게 벌어지지 않도록 조정 */
+.schedule-board {
+  height: auto;
+
+  /* 1fr 대신 실제 카드 높이만큼만 사용 */
+  grid-template-rows: auto auto auto;
+
+  /* 날짜 카드 사이의 적당한 간격 */
+  row-gap: clamp(18px, 2.4vh, 30px);
+
+  /* 일정표 전체를 본문 중앙 부근에 배치 */
+  align-content: center;
+  align-items: stretch;
+}
+
+/* 각 날짜 카드는 별도로 위·아래에 붙이지 않음 */
+.schedule-day.day-1,
+.schedule-day.day-2,
+.schedule-day.day-3 {
+  align-self: stretch;
+}
+
+/* 이전에 DAY 2 이동값을 추가했다면 초기화 */
+.schedule-day.day-2 {
+  transform: none;
+}
+
+/* 날짜별 카드 내부 여백도 조금 축소 */
+.schedule-day {
+  padding: clamp(9px, 1.1vh, 13px);
+}
+
+/* 2일 차와 3일 차에 적용했던 과도한 최소 높이 해제 */
+.schedule-day.day-2,
+.schedule-day.day-3 {
+  min-height: 88px;
+}
+
+/* 일정표와 하단 안전 안내 사이 간격 */
+.schedule-content {
+  gap: clamp(12px, 1.5vh, 18px);
+}
+
+/* 화면 높이가 낮을 때 */
+@media (max-height: 720px) {
+  .schedule-board {
+    row-gap: 9px;
+  }
+
+  .schedule-content {
+    gap: 9px;
+  }
+
+  .schedule-day {
+    padding: 7px;
+  }
+
+  .schedule-day.day-2,
+  .schedule-day.day-3 {
+    min-height: 74px;
+  }
+}
+
+/* PDF 출력 간격 */
+@media print {
+  .schedule-board {
+    height: auto;
+    grid-template-rows: auto auto auto;
+    row-gap: 3.5mm;
+    align-content: center;
+  }
+
+  .schedule-day.day-1,
+  .schedule-day.day-2,
+  .schedule-day.day-3 {
+    align-self: stretch;
+  }
+
+  .schedule-day.day-2 {
+    transform: none;
+  }
+}
 </style>
 </head>
 
